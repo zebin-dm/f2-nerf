@@ -1,5 +1,4 @@
 import os
-import click
 import numpy as np
 from shutil import copyfile
 from omegaconf import OmegaConf, DictConfig
@@ -8,10 +7,18 @@ import hydra
 
 backup_file_patterns = [
     './CMakeLists.txt',
-    './*.cpp', './*.h', './*.cu',
-    './src/*.cpp', './src/*.h', './src/*.cu',
-    './src/*/*.cpp', './src/*/*.h', './src/*/*.cu',
-    './src/*/*/*.cpp', './src/*/*/*.h', './src/*/*/*.cu',
+    './*.cpp',
+    './*.h',
+    './*.cu',
+    './src/*.cpp',
+    './src/*.h',
+    './src/*.cu',
+    './src/*/*.cpp',
+    './src/*/*.h',
+    './src/*/*.cu',
+    './src/*/*/*.cpp',
+    './src/*/*/*.h',
+    './src/*/*/*.cu',
 ]
 
 
@@ -20,12 +27,12 @@ def make_image_list(data_path, factor):
     suffix = ['*.jpg', '*.png', '*.JPG', '*.jpeg']
     if 0.999 < factor < 1.001:
         for suf in suffix:
-            image_list += glob(os.path.join(data_path, 'images', suf)) +\
-                          glob(os.path.join(data_path, 'images_1', suf))
+            image_list += glob(f"{data_path}/images/{suf}")
     else:
         f_int = int(np.round(factor))
         for suf in suffix:
-            image_list += glob(os.path.join(data_path, 'images_{}'.format(f_int), suf))
+            image_list += glob(
+                os.path.join(data_path, 'images_{}'.format(f_int), suf))
 
     assert len(image_list) > 0, "No image found"
     image_list.sort()
@@ -43,9 +50,9 @@ def main(conf: DictConfig) -> None:
         base_dir = os.getcwd()
 
     print('Working directory is {}'.format(base_dir))
-
-    data_path = os.path.join(base_dir, 'data', conf['dataset_name'], conf['case_name'])
-    base_exp_dir = os.path.join(base_dir, 'exp', conf['case_name'], conf['exp_name'])
+    data_path = f"{conf['data_path']}/{conf['dataset_name']}"
+    base_exp_dir = os.path.join(base_dir, 'exp', conf['dataset_name'],
+                                conf['exp_name'])
 
     os.makedirs(base_exp_dir, exist_ok=True)
 
@@ -69,6 +76,8 @@ def main(conf: DictConfig) -> None:
 
     OmegaConf.save(conf, os.path.join(file_backup_dir, 'runtime_config.yaml'))
     OmegaConf.save(conf, './runtime_config.yaml')
+
+    os.system('cmake --build build --target main --config RelWithDebInfo -j')
 
     for build_dir in ['build', 'cmake-build-release']:
         if os.path.exists('{}/{}/main'.format(base_dir, build_dir)):

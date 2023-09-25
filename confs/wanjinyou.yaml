@@ -7,8 +7,8 @@ defaults:
   - shader: sh_shader
   - _self_
 
-dataset_name: example
-case_name: tmp
+data_path: null
+dataset_name: null
 exp_name: test
 
 is_continue: false

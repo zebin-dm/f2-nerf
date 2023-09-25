@@ -1,5 +1,5 @@
 defaults:
-  - train: 50k
+  - train: 20k
   - dataset: default
   - renderer: default
   - pts_sampler: perspective
@@ -7,32 +7,27 @@ defaults:
   - shader: sh_shader
   - _self_
 
-dataset_name: example
-case_name: tmp
+data_path: null
+dataset_name: null
 exp_name: test
 
 is_continue: false
 
 mode: train
 
-field:
-  log2_table_size: 20
-
 renderer:
   # Appearance embedding to handling unstable lighting conditions
   use_app_emb: true
 
 pts_sampler:
-  split_dist_thres: 1.5
   near: 0.01
   scale_by_dis: true
 
 dataset:
   factor: 1
-  bounds_factor: [ 0.5, 4.0]
+  bounds_factor: [ 0.5, 4.0 ]
 
 train:
   ray_march_init_fineness: 16
   gradient_scaling_start: 1000
   gradient_scaling_end: 5000
-
