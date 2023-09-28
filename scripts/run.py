@@ -56,35 +56,21 @@ def main(conf: DictConfig) -> None:
 
     os.makedirs(base_exp_dir, exist_ok=True)
 
-    # backup codes
-    # file_backup_dir = os.path.join(base_exp_dir, 'record/')
-    # os.makedirs(file_backup_dir, exist_ok=True)
-
-    # for file_pattern in backup_file_patterns:
-    #     file_list = glob(os.path.join(base_dir, file_pattern))
-    #     for file_name in file_list:
-    #         new_file_name = file_name.replace(base_dir, file_backup_dir)
-    #         os.makedirs(os.path.dirname(new_file_name), exist_ok=True)
-    #         copyfile(file_name, new_file_name)
-
     make_image_list(data_path, conf['dataset']['factor'])
 
     conf = OmegaConf.to_container(conf, resolve=True)
     conf['dataset']['data_path'] = data_path
     conf['base_dir'] = base_dir
     conf['base_exp_dir'] = base_exp_dir
-
-    # OmegaConf.save(conf, os.path.join(file_backup_dir, 'runtime_config.yaml'))
-    OmegaConf.save(conf, './runtime_config.yaml')
-
+    config_file = f'{base_exp_dir}/runtime_config.yaml'
+    OmegaConf.save(conf, config_file)
     os.system('cmake --build build --target main --config RelWithDebInfo -j')
 
     for build_dir in ['build', 'cmake-build-release']:
         if os.path.exists('{}/{}/main'.format(base_dir, build_dir)):
-            os.system('{}/{}/main'.format(base_dir, build_dir))
-            return
-
-    assert False, 'Can not find executable file'
+            os.system(f'{base_dir}/{build_dir}/main {config_file}')
+        else:
+            assert False, 'Can not find executable file'
 
 
 if __name__ == '__main__':
