@@ -343,23 +343,10 @@ std::tuple<Tensor, Tensor> ExpRunner::RenderWholeImageForMesh(Tensor rays_o,
         renderer_->Render(cur_rays_o, cur_rays_d, cur_bounds, Tensor());
     Tensor colors = render_result.colors.detach().to(torch::kCPU);
     Tensor depths = render_result.depth.detach().to(torch::kCPU).squeeze();
-    // Tensor disp = render_result.disparity.detach().to(torch::kCPU).squeeze();
 
     pred_colors.index_put_({Slc(i, i_high)}, colors);
     pred_depths.index_put_({Slc(i, i_high)}, depths.unsqueeze(-1));
-    // pred_disp.index_put_({Slc(i, i_high)}, disp.unsqueeze(-1));
-    // if (!render_result.first_oct_dis.sizes().empty()) {
-    //   Tensor &ret_first_oct_dis = render_result.first_oct_dis;
-    //   if (ret_first_oct_dis.has_storage()) {
-    //     Tensor cur_first_oct_dis =
-    //         render_result.first_oct_dis.detach().to(torch::kCPU);
-    //     first_oct_disp.index_put_({Slc(i, i_high)}, cur_first_oct_dis);
-    //   }
-    // }
   }
-  // pred_disp = pred_disp / pred_disp.max();
-  // first_oct_disp = first_oct_disp.min() / first_oct_disp;
-
   return {pred_colors, pred_depths};
 }
 
